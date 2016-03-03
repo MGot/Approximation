@@ -10,7 +10,7 @@
 
 class Vertex {
     unsigned int id;
-    std::vector<Edge> adjecentEdges;
+    std::vector<Edge> adjacentEdges;
 
 public:
     Vertex(unsigned int);
@@ -20,17 +20,17 @@ public:
 
     inline void addAdjacentEdge(Edge e)
     {
-        adjecentEdges.push_back(e);
+        adjacentEdges.push_back(e);
     }
 
     inline Edge getAdjecentEdge(int i)
     {
-        return adjecentEdges[i];
+        return adjacentEdges[i];
     }
 
     inline unsigned long getAdjacentEdgesNumber()
     {
-        return adjecentEdges.size();
+        return adjacentEdges.size();
     }
 };
 

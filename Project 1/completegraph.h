@@ -17,8 +17,8 @@ public:
     CompleteGraph(unsigned int);
     virtual ~CompleteGraph();
 
-    std::vector<Vertex>* getMST();
-    std::vector<Vertex>* getEulerCycle();
+    std::vector<Vertex>* getMST(); // finding and returning minimum spanning tree
+    std::vector<Vertex>* getEulerCycle(); // finding and returning euler cycle
 
     void showGraph();
 
@@ -26,6 +26,11 @@ public:
     {
         return numberOfVertexes;
     }
+
+    // here should be implemented finding the perfect match
+    // for know I don't have idea, what type should be returned
+    // maybe some c++ pair(Vertex, Vertex) object
+    void getPerfectMatching();
 };
 
 

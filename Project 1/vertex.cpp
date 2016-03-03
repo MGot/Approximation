@@ -15,6 +15,7 @@ Vertex::~Vertex()
 
 }
 
+// comparing function for std::sort
 struct {
     bool operator()(Edge a, Edge b)
     {
@@ -24,5 +25,5 @@ struct {
 
 void Vertex::sortAdjacentList()
 {
-    std::sort(adjecentEdges.begin(),adjecentEdges.end(), comparisonFunction);
+    std::sort(adjacentEdges.begin(),adjacentEdges.end(), comparisonFunction);
 }
