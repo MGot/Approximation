@@ -16,7 +16,9 @@ public:
     Vertex(unsigned int);
     virtual ~Vertex();
 
-    inline void addAdjecentEdge(Edge e)
+    void sortAdjacentList();
+
+    inline void addAdjacentEdge(Edge e)
     {
         adjecentEdges.push_back(e);
     }
@@ -26,7 +28,7 @@ public:
         return adjecentEdges[i];
     }
 
-    inline unsigned long getAdjecentEdgesNumber()
+    inline unsigned long getAdjacentEdgesNumber()
     {
         return adjecentEdges.size();
     }

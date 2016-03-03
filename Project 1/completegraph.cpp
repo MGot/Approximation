@@ -12,7 +12,7 @@ using namespace std;
 
 CompleteGraph::CompleteGraph(unsigned int numberOfVertexes) : numberOfVertexes(numberOfVertexes)
 {
-    std::srand(std::time(0));
+    std::srand(std::time(nullptr));
     for(auto i = 0; i < numberOfVertexes; ++i)
     {
         graphVertexes.push_back(Vertex(i));
@@ -22,10 +22,10 @@ CompleteGraph::CompleteGraph(unsigned int numberOfVertexes) : numberOfVertexes(n
             {
                 Edge e(i, j, rand() % 100 + 1);
                 graphEdges.push_back(e); // weight is a random number from range 1 to 100
-                graphVertexes[i].addAdjecentEdge(e);
+                graphVertexes[i].addAdjacentEdge(e);
             }
-
         }
+        graphVertexes[i].sortAdjacentList();
     }
 }
 
@@ -41,7 +41,7 @@ void CompleteGraph::showGraph()
     {
 
         cout << "\t" << i << "\t\t\t\t\t";
-        for(auto j = 0; j < graphVertexes[i].getAdjecentEdgesNumber(); ++j)
+        for(auto j = 0; j < graphVertexes[i].getAdjacentEdgesNumber(); ++j)
         {
             if(j != 0 )
                 cout << "\t\t\t\t\t\t";
