@@ -10,27 +10,39 @@
 #include <vector>
 
 class CompleteGraph {
-    unsigned int numberOfVertexes;
-    std::vector<Edge> graphEdges;
-    std::vector<Vertex> graphVertexes;
+
 public:
     CompleteGraph(unsigned int);
     virtual ~CompleteGraph();
 
-    std::vector<Vertex>* getMST(); // finding and returning minimum spanning tree
+    void findMST(); // finding and returning minimum spanning tree
     std::vector<Vertex>* getEulerCycle(); // finding and returning euler cycle
 
     void showGraph();
 
-    inline unsigned int getNumberOfVertexes()
+    inline unsigned int getNumberOfVertexes() const
     {
         return numberOfVertexes;
+    }
+
+    inline std::vector<Vertex*> getMST() const
+    {
+        return mst;
     }
 
     // here should be implemented finding the perfect match
     // for know I don't have idea, what type should be returned
     // maybe some c++ pair(Vertex, Vertex) object
     void getPerfectMatching();
+
+private:
+    unsigned int numberOfVertexes;
+    std::vector<Edge> graphEdges;
+    std::vector<Vertex> graphVertices;
+    std::vector<Vertex*> mst;
+
+    std::vector<Vertex *> getVertexNeighbors(Vertex);
+    Vertex* findVertex(int);
 };
 
 

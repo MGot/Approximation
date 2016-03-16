@@ -5,7 +5,7 @@
 #include "vertex.h"
 #include <algorithm>
 
-Vertex::Vertex(unsigned int id) : id(id)
+Vertex::Vertex(unsigned int id) : id(id), visited(false)
 {
 
 }
@@ -21,9 +21,10 @@ struct {
     {
         return a.getWeight() < b.getWeight();
     }
-} comparisonFunction;
+} cmpEdges;
 
-void Vertex::sortAdjacentList()
+
+void Vertex::sortAdjacentLists()
 {
-    std::sort(adjacentEdges.begin(),adjacentEdges.end(), comparisonFunction);
+    std::sort(adjacentEdges.begin(),adjacentEdges.end(), cmpEdges);
 }
