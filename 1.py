@@ -4,11 +4,10 @@ import networkx.algorithms.approximation as naa
 
 import random
 
-n = 4 #number of nodes
+n = 5 #number of nodes
 G = nx.MultiGraph()
 
 for i in range(0,n):
-	G.add_node(i)
 	for j in range(i,n):
 		if i != j:
 			G.add_edge(i,j,weight = random.randint(0,100))
@@ -21,10 +20,25 @@ weights = nx.get_edge_attributes(tempMst, 'weight')
 for i in tempMst.edges():
 	T.add_edge(*i,weight=weights[i])
 
-M = naa.min_maximal_matching(T)
 
-for i in M:
-	T.add_edge(*i,weight=weights[i])
+nodesT = list() # lista wierzchołków o nieparzystego stopnia
+degrees = nx.degree(T)
+for key in degrees.keys():
+    if degrees[key] % 2 != 0:
+        nodesT.append(key)
+
+tmpM = nx.MultiGraph()
+for i in nodesT:
+    for j in nodesT:
+        if i < j: # bierzemy krawędź tylko raz
+            tmpM.add_edge(i, j, weight = G[i][j][0]['weight'])
+
+M = naa.min_maximal_matching(tmpM)
+
+for e in M:
+    i = e[0] # z jakiegoś powodu weights[e] sypie errorem
+    j = e[1]
+    T.add_edge(*e, G[i][j][0]['weight'])
 
 
 
