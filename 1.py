@@ -4,7 +4,7 @@ import networkx.algorithms.approximation as naa
 
 import random
 
-n = 10 #number of nodes
+n = 4 #number of nodes
 G = nx.MultiGraph()
 
 for i in range(0,n):
@@ -26,16 +26,25 @@ M = naa.min_maximal_matching(T)
 for i in M:
 	T.add_edge(*i,weight=weights[i])
 
-E = nx.eulerian_circuit(T)
+
+
+E1 = nx.is_eulerian(T)
+if E1:
+	E = list(nx.eulerian_circuit(T))
 
 print ()
 print ("G:", G.edges(data=True))
+print ()
+print ("Mst:", tempMst.edges(data=True))
 print ()
 print ("T:", T.edges(data=True))
 print ()
 print ("M:", M)
 print ()
-print ("E:", E)
+print ("E1:", E1)
+if E1:
+	print ()
+	print ("E:", E)
 
 pos=nx.shell_layout(T)
 
