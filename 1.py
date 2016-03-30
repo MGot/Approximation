@@ -16,6 +16,7 @@ tempMst = nx.minimum_spanning_tree(G)
 T = nx.MultiGraph()
 
 weights = nx.get_edge_attributes(tempMst, 'weight')
+weightsG = nx.get_edge_attributes(G, 'weight')
 
 for i in tempMst.edges():
 	T.add_edge(*i,weight=weights[i])
@@ -36,11 +37,7 @@ for i in nodesT:
 M = naa.min_maximal_matching(tmpM)
 
 for e in M:
-    i = e[0] # z jakiegoś powodu weights[e] sypie errorem
-    j = e[1]
-    T.add_edge(*e, G[i][j][0]['weight'])
-
-
+    T.add_edge(*e, weight = weightsG[e + (0,)])
 
 E1 = nx.is_eulerian(T)
 if E1:
