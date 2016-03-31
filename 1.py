@@ -156,15 +156,34 @@ def calc(G, draw=True, time=False):
 		bf_count = 0
 		min_weight = math.inf
 		min_cycle = []
-	
+
+def metric_graph_generator(n):
+	G = nx.MultiGraph()
+	G.add_edge(0,1,weight = random.randint(0,1000))
+	if n == 2:
+		return G
+	for i in range(2,n):
+		#print(i)
+		for e in G.edges():
+			x = G[e[0]][e[1]][0]['weight']
+			if not G.has_edge(e[0],i):
+				G.add_edge(e[0],i,weight = random.randint(0,1000))
+
+			y = G[e[0]][i][0]['weight']
+			if not G.has_edge(e[1],i):
+				G.add_edge(e[1],i,weight = random.randint(max(x-y,y-x),x+y))
+			#print(G.edges(data=True))
+
+	return G
 
 if len(sys.argv)==1:
 	print("Write arguments [1 <number of nodes>] to create random n-nodes graph (time test)")
-	print("Write arguments [2] to create random 2 to 7-nodes graphs (aproximation test)")
+	print("Write arguments [2] to create random 2 to 8-nodes graphs (aproximation test)")
 	print("Write arguments [3 <number of nodes>] to create n-nodes graph with edges weight = 1 (aproximation test)")
 	print("Write arguments [4 <number of nodes>] to create n-nodes graph with one cycles weight = n and other cycles weight >= 1996+n (aproximation test)")
+	print("Write arguments [5 <number of nodes>] to create metric random n-nodes graph (time test)")
 	exit()
-elif sys.argv[1] == "1" or sys.argv[1]=="3" or sys.argv[1]=="4":
+elif sys.argv[1]=="1" or sys.argv[1]=="3" or sys.argv[1]=="4":
 	if int(sys.argv[2])>1:
 		n = int(sys.argv[2]) #number of nodes
 		G = nx.MultiGraph()
@@ -185,16 +204,27 @@ elif sys.argv[1] == "1" or sys.argv[1]=="3" or sys.argv[1]=="4":
 		print("Should be n > 1")
 		exit()
 elif sys.argv[1] == "2":
-	for n in range(2,8):
-		G = nx.MultiGraph()
-		for i in range(0,n):
-			for j in range(i,n):
-				if i != j:
-					G.add_edge(i,j,weight = random.randint(0,1000))
+	for n in range(2,9):
+		#G = nx.MultiGraph()
+		#for i in range(0,n):
+		#	for j in range(i,n):
+		#		if i != j:
+		#			G.add_edge(i,j,weight = random.randint(0,1000))
 		print(str(n))
+		G = metric_graph_generator(n)
 		print(G.edges(data=True))
 		calc(G)
 		print()
+elif sys.argv[1] == "5":
+	if int(sys.argv[2])>1:
+		n = int(sys.argv[2]) #number of nodes
+		G = metric_graph_generator(n)
+		print(str(n))
+		calc(G, draw=False, time=True)
+	else:
+		print("Should be n > 1")
+		exit()
+
 
 
 
