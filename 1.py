@@ -75,6 +75,10 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 	E1 = nx.is_eulerian(T)
 	if E1:
 		E = list(nx.eulerian_circuit(T))
+		H = list()
+		for e in E:
+			if e[0] not in H:
+				H.append(e)
 
 	if time:
 		end = datetime.datetime.now()
@@ -94,6 +98,8 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 		if E1:
 			print ()
 			print ("E:", E)
+			print ()
+			print ("H:", H)
 
 	if draw:
 		edge_labels=dict([((u,v,),d['weight']) for u,v,d in G.edges(data=True)])
@@ -115,7 +121,7 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 		plt.savefig("figures/"+str(datetime.datetime.now()).replace(":","-")+".png")
 		plt.clf()
 
-	return E, aprox_tcp_weight(E,G)
+	return H, aprox_tcp_weight(H,G)
 
 def print_aprox_cycle(E):
 	for i in E:
