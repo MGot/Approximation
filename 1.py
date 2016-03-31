@@ -75,10 +75,13 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 	E1 = nx.is_eulerian(T)
 	if E1:
 		E = list(nx.eulerian_circuit(T))
-		H = list()
+		H = []
+		prevNodes = [E[0][0]]
 		for e in E:
-			if e[0] not in H:
-				H.append(e)
+			if e[1] not in prevNodes:
+				H.append((prevNodes[-1],e[1]))
+				prevNodes += [e[1]]
+		H.append((prevNodes[-1],prevNodes[0]))
 
 	if time:
 		end = datetime.datetime.now()
@@ -106,16 +109,23 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 		pos=nx.shell_layout(G)
 		nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
 		#caly graf (czerwone krawedzie)
-		nx.draw(G,pos, node_color = 'r',edge_size=50,width=6,font_size=18, 
+		nx.draw(G,pos, node_color = 'r',edge_size=50,width=8,font_size=18, 
 			node_size=700,edge_color='r',edge_cmap=plt.cm.Reds,with_labels=True)
-		pos=nx.shell_layout(T)
 		pos=nx.shell_layout(tmpMst)
 		#MST (zolte)
-		nx.draw(tmpMst,pos, node_color = 'r',edge_size=50,width=4,font_size=18, 
+		nx.draw(tmpMst,pos, node_color = 'r',edge_size=50,width=6,font_size=18, 
 			node_size=700,edge_color='y',edge_cmap=plt.cm.Reds,with_labels=False)
+		pos=nx.shell_layout(T)
 		#T (niebieskie)
-		nx.draw(T,pos, node_color = 'r',edge_size=50,width=2,font_size=18, 
+		nx.draw(T,pos, node_color = 'r',edge_size=50,width=4,font_size=18, 
 			node_size=700,edge_color='b',edge_cmap=plt.cm.Reds,with_labels=False)
+		#H (biale)
+		drawH = nx.MultiGraph()
+		for i in H:
+			drawH.add_edge(i[0],i[1])
+
+		nx.draw(drawH,pos, node_color = 'r',edge_size=50,width=2,font_size=18, 
+			node_size=700,edge_color='w',edge_cmap=plt.cm.Reds,with_labels=False)
 		if not os.path.exists("figures/"):
 			os.makedirs("figures/")
 		plt.savefig("figures/"+str(datetime.datetime.now()).replace(":","-")+".png")
@@ -151,15 +161,25 @@ def calc(G, draw=True, time=False):
 if len(sys.argv)==1:
 	print("Write arguments [1 <number of nodes>] to create random n-nodes graph (time test)")
 	print("Write arguments [2] to create random 2 to 7-nodes graphs (aproximation test)")
+	print("Write arguments [3 <number of nodes>] to create n-nodes graph with edges weight = 1 (aproximation test)")
+	print("Write arguments [4 <number of nodes>] to create n-nodes graph with one cycles weight = n and other cycles weight >= 1996+n (aproximation test)")
 	exit()
-elif sys.argv[1] == "1":
+elif sys.argv[1] == "1" or sys.argv[1]=="3" or sys.argv[1]=="4":
 	if int(sys.argv[2])>1:
 		n = int(sys.argv[2]) #number of nodes
 		G = nx.MultiGraph()
 		for i in range(0,n):
 			for j in range(i,n):
 				if i != j:
-					G.add_edge(i,j,weight = random.randint(0,100))
+					if sys.argv[1] == "1":
+						G.add_edge(i,j,weight = random.randint(0,1000))
+					elif sys.argv[1] == "3":
+						G.add_edge(i,j,weight = 1)
+					elif sys.argv[1]=="4":
+						if i+1==j or i==(j+1)%n:
+							G.add_edge(i,j,weight = 1)
+						else:
+							G.add_edge(i,j,weight = 999)
 		calc(G, draw=False, time=True)
 	else:
 		print("Should be n > 1")
@@ -170,7 +190,7 @@ elif sys.argv[1] == "2":
 		for i in range(0,n):
 			for j in range(i,n):
 				if i != j:
-					G.add_edge(i,j,weight = random.randint(0,100))
+					G.add_edge(i,j,weight = random.randint(0,1000))
 		print(str(n))
 		print(G.edges(data=True))
 		calc(G)
