@@ -7,8 +7,6 @@ import sys
 import math
 import datetime
 
-
-
 bf_count = 0
 min_weight = math.inf
 min_cycle = []
@@ -142,7 +140,8 @@ def calc(G, draw=True, time=False):
 	
 
 if len(sys.argv)==1:
-	print("Write arguments [1 <number of nodes>] to create random n-nodes graph")
+	print("Write arguments [1 <number of nodes>] to create random n-nodes graph (time test)")
+	print("Write arguments [2] to create random 2 to 7-nodes graphs (aproximation test)")
 	exit()
 elif sys.argv[1] == "1":
 	if int(sys.argv[2])>1:
@@ -157,7 +156,7 @@ elif sys.argv[1] == "1":
 		print("Should be n > 1")
 		exit()
 elif sys.argv[1] == "2":
-	for n in range(2,7):
+	for n in range(2,8):
 		G = nx.MultiGraph()
 		for i in range(0,n):
 			for j in range(i,n):
