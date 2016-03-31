@@ -6,6 +6,7 @@ import random
 import sys
 import math
 import datetime
+import os.path
 
 bf_count = 0
 min_weight = math.inf
@@ -109,6 +110,8 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 		#T (niebieskie)
 		nx.draw(T,pos, node_color = 'r',edge_size=50,width=2,font_size=18, 
 			node_size=700,edge_color='b',edge_cmap=plt.cm.Reds,with_labels=False)
+		if not os.path.exists("figures/"):
+			os.makedirs("figures/")
 		plt.savefig("figures/"+str(datetime.datetime.now()).replace(":","-")+".png")
 		plt.clf()
 
