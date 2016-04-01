@@ -1,6 +1,9 @@
+import mwmatching
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import networkx.algorithms.approximation as naa
+import networkx.algorithms.matching as nam
 
 import random
 import sys
@@ -45,33 +48,29 @@ def aprox_tcp_weight(E,G):
 def aprox_tcp(G, prints=False, draw=False, time=False):
 	if time:
 		start = datetime.datetime.now()
-
 	tmpMst = nx.minimum_spanning_tree(G)
 	T = nx.MultiGraph()
-
 	weights = nx.get_edge_attributes(G, 'weight')
 	weightsMST = nx.get_edge_attributes(tmpMst, 'weight')
-
 	for i in tmpMst.edges():
 		T.add_edge(*i,weight=weightsMST[i])
-
 	nodesT = list() # lista wierzchołków o nieparzystego stopnia
 	degrees = nx.degree(T)
 	for key in degrees.keys():
-	    if degrees[key] % 2 != 0:
-	        nodesT.append(key)
-
-	tmpM = nx.MultiGraph()
+		if degrees[key] % 2 != 0:
+			nodesT.append(key)
+	edges = list()
 	for i in nodesT:
-	    for j in nodesT:
-	        if i < j: # bierzemy krawędź tylko raz
-	            tmpM.add_edge(i, j, weight = G[i][j][0]['weight'])
-
-	M = naa.min_maximal_matching(tmpM)
-
-	for e in M:
+		for j in nodesT:
+			if i < j: # bierzemy krawędź tylko raz
+				edges.append((i, j, -1.0 * G[i][j][0]['weight']))
+	M = mwmatching.maxWeightMatching(edges, maxcardinality=True)
+	MP = list()
+	for i in range(0, len(M)):
+		if not ((i,M[i]) in MP or (M[i],i) in MP) and M[i] != -1:
+			MP.append((i,M[i]))
+	for e in MP:
 		T.add_edge(*e, weight = weights[e + (0,)])
-
 	E1 = nx.is_eulerian(T)
 	if E1:
 		E = list(nx.eulerian_circuit(T))
@@ -82,11 +81,9 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 				H.append((prevNodes[-1],e[1]))
 				prevNodes += [e[1]]
 		H.append((prevNodes[-1],prevNodes[0]))
-
 	if time:
 		end = datetime.datetime.now()
 		print(end-start)
-
 	if prints:
 		print ()
 		print ("G:", G.edges(data=True))
@@ -103,7 +100,6 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 			print ("E:", E)
 			print ()
 			print ("H:", H)
-
 	if draw:
 		edge_labels=dict([((u,v,),d['weight']) for u,v,d in G.edges(data=True)])
 		pos=nx.shell_layout(G)
@@ -123,14 +119,12 @@ def aprox_tcp(G, prints=False, draw=False, time=False):
 		drawH = nx.MultiGraph()
 		for i in H:
 			drawH.add_edge(i[0],i[1])
-
 		nx.draw(drawH,pos, node_color = 'r',edge_size=50,width=2,font_size=18, 
 			node_size=700,edge_color='w',edge_cmap=plt.cm.Reds,with_labels=False)
 		if not os.path.exists("figures/"):
 			os.makedirs("figures/")
 		plt.savefig("figures/"+str(datetime.datetime.now()).replace(":","-")+".png")
 		plt.clf()
-
 	return H, aprox_tcp_weight(H,G)
 
 def print_aprox_cycle(E):
@@ -185,7 +179,7 @@ elif sys.argv[1] == "1" or sys.argv[1]=="3" or sys.argv[1]=="4":
 		print("Should be n > 1")
 		exit()
 elif sys.argv[1] == "2":
-	for n in range(2,8):
+	for n in range(2,10):
 		G = nx.MultiGraph()
 		for i in range(0,n):
 			for j in range(i,n):
