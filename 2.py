@@ -74,35 +74,35 @@ def readFile(path):
 def transpose(A):
 	return [[A[j][i] for j in range(0, len(A))] for i in range(0, len(A[0]))]
 
-def print_lp(A, b, C, s, zmienna="π"):
+def print_lp(A, b, C, s, variables):
 	max = find_max_long_of_int(A, b, C)
 	xes = len(str(len(A[0])))
-	str1 = "{{p:3}}{{a:>{}}}{{g:1}}{{x:1}}{{j:<{}}}".format(max, xes)			# '{plus:3}{Aij:>[max]}{gwiazdka:1}{x:1}{indeks_x:<[xes]}'
-	str2 = "  {{z:<2}}	{{b:>{}}}".format(max)									# '  {znak:<2}	{bi:>5}'
+	str1 = "{{p:3}}{{a:>{}}}{{g:1}}{{x:2}}".format(max, xes)				# '{plus:3}{Aij:>[max]}{gwiazdka:1}{x:2}'
+	str2 = "  {{z:<2}}	{{b:>{}}}".format(max)						# '  {znak:<2}	{bi:>[max]}'
 	n = len(A[0])
 	for r in range(0, len(A)):
 		row = A[r]
 		written = False
 		for c in range(0, len(row)):
 			if row[c] != 0:
-				print(str1.format(a=row[c], x=zmienna, g="*", j=c+1, p=" + " if written else ""), end="")
+				print(str1.format(a=row[c], x=variables[c], g="*", p=" + " if written else ""), end="")
 				written = True
 			else:
-				print(str1.format(a="", x="", g="", j="", p=""), end="")
+				print(str1.format(a="", x="", g="", p=""), end="")
 		print(str2.format(z=s[r], b=b[r]))
-	print("FUNKCJA CELU:")
+	print("Funkcja celu:\n")
 	written = False
-	for i in range(0, len(C[:-1])):
+	for i in range(0, len(variables)):
 		if i != 0:
-			print(str1.format(a=i, x=zmienna, g="*", j=i+1, p=" + " if written else ""), end="")
+			print(str1.format(a=i, x=variables[i], g="*", p=" + " if written else ""), end="")
 			written = True
 		else:
-			print(str1.format(a="", x="", g="", j="", p=""), end="")
+			print(str1.format(a="", x="", g="", p=""), end="")
 	print()
 
-def print_Axbc(A, b, C, s, zmienna="π"):
+def print_Axbc(A, b, C, s, variables):
 	max = find_max_long_of_int(A, b, C)
-	str1 = "{{:{}}}{{:2}}".format(max)
+	str1 = "{{:>{}}}{{:2}}".format(max)
 	print("C = {}".format(C))
 	print("s = {}".format(s))
 	print("A || b = ")
@@ -110,51 +110,90 @@ def print_Axbc(A, b, C, s, zmienna="π"):
 		row = A[r]
 		for c in range(0, len(row)):
 			print(str1.format(row[c], ", " if c < len(row)-1 else ""), end="")
-		print("|| ", end="")
-		print(str1.format(b[r], ""))
-	print("{} = [".format(zmienna), end="")
-	for i in range(0, len(A[0])):
-		print("{}{}{}".format(zmienna, i+1, ", " if i < len(A[0])-1 else ""), end="")
-	print("]")
+		print("|| " + str1.format(b[r], ""))
+	print("zmienne =")
+	for i in range(0, len(variables)):
+		print(str1.format(variables[i], ", " if i < len(A[0])-1 else ""), end="")
+	print()
 
 def primal_to_dual(A, b, C, s):
 	AT = transpose(A)
 	sp = []
-	for i in s:             # po sprowadzeniu do standardowej do poprawki
-		if i == ">":
-			sp.append("<")
-		elif i == "<":
-			sp.append(">")
-		elif i == ">=":
-			sp.append("<=")
-		elif i == "<=":
-			sp.append(">=")
-		else:
-			sp.append("=")
+	for i in len(A):
+		sp.append("=")
 	return AT, C, b, sp
 
+def replace_free_var(d, x):
+	t = x[:]
+	c = 0
+	for i in range(0, len(d)):
+		if d[i] == 'R':
+			t[i+c] = "y{}".format(i+1)
+			c += 1
+			t.insert(i+c, "z{}".format(i+1))
+		elif d[i] == '<=':
+			t[i+c] = "y{}".format(i+1)
+	return t
+
+def add_s_var(signs, x):
+	t = x[:]
+	c = 0
+	for i in range(0, len(signs)):
+		if signs[i] == '<=' or signs[i] == '<':
+			t.append("s{}".format(i+1))
+			c += 1
+		if signs[i] == '>=' or signs[i] == '>':
+			t.append("s{}".format(i+1))
+			c += 1
+	sn = ['=' for s in signs]
+	return sn, t, c
+
+def gen_vars(size, var="π"):
+	str1 = "{}{{}}".format(var)
+	X = []
+	for i in range(0, size):
+		X.append(str1.format(i+1))
+	return X
+
 def find_max_long_of_int(A, b, c):
-	x = [
+	max = [
 		min([y if y < 0 else -y for y in b]),
 		min([y if y < 0 else -y for y in c]),
 		min([y if y < 0 else -y for r in A for y in r])
 	]
-	return len(str(min(x)))
+	return len(str(min(max)))
 
-C = []
-A = []
-b = []
-s = []
 
-C, A, b, s = readFile(sys.argv[1])
+C, A, b, S = readFile(sys.argv[1])
 
-print("PRYMALNE")
-print_Axbc(A, b, C, s, zmienna="x")
+print("_____________________________________________________________________________________")
+print("\nPRYMALNE\n")
+variables = gen_vars(len(A[0]), var='x')
+print_Axbc(A, b, C, S, variables)
+print("\n\nUkład:\n")
+print_lp(A, b, C, S, variables)
 print("\n\n")
-#print_lp(A, b, C, s, zmienna="x") # ten ok
-AT, bT, CT, sT = primal_to_dual(A, b, C, s)
-print("\n\n")
-print("DUALNE")
-print_Axbc(AT, bT, CT, sT)
-print("\n\n")
-#print_lp(AT, bT, CT, sT) # nie ma jeszcze wszystkich znaków takich samych, więc się sypnie
+
+print("_____________________________________________________________________________________")
+print("\nPOSTAĆ STANDARDOWA\n")
+"""
+	zakłada istnienie wektora d zawierającego 'R', '<=', lub '=>'
+	Ss - znaki dla postaci standardowej
+	As - macierz A po sprowadzeniu do postaci standardowej
+	Cs - funkcja celu po sprowadzeniu do postaci standardowej
+"""
+#vars_tmp = replace_free_var(d, variables)
+#Ss, variablesS, s_len = add_s_var(S, vars_tmp)
+#print_Axbc(As, b, Cs, Ss, variablesS)
+#print("\n\nUkład:\n")
+#print_lp(As, b, Cs, Ss, variablesS)
+#print("\n\n")
+
+print("_____________________________________________________________________________________")
+print("\nDUALNE\n")
+""" wymaga postaci standardowej """
+#AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
+#variablesD = gen_vars(len(AD[0]))
+#print_Axbc(AD, bD, CD, SD, variablesD)
+#print("\n\nUkład:\n")
+#print_lp(AD, bD, CD, SD, variablesD)
