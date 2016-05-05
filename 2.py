@@ -72,32 +72,74 @@ def readFile(path):
 
 
 def transpose(A):
-    return [[A[j][i] for j in range(0, len(A))] for i in range(0, len(A[0]))]
+	return [[A[j][i] for j in range(0, len(A))] for i in range(0, len(A[0]))]
 
-def print_lp(A, b, c, s):
-    max = find_max_long_of_int(A, b, c)
-    xes = len(str(len(A[0])))
-    str1 = "{{p:3}}{{a:>{}}}{{g:1}}{{x:1}}{{j:<{}}}".format(max, xes)           # '{plus:3}{Aij:>[max]}{gwiazdka:1}{x:1}{indeks_x:<[xes]}'
-    str2 = "  {{z:<2}}  {{b:>{}}}".format(max)                                  # '  {znak:<2}  {bi:>5}'
-    n = len(A[0])
-    for r in range(0, len(A)):
-        row = A[r]
-        written = False
-        for c in range(0, len(row)):
-            if row[c] != 0:
-                print(str1.format(a=row[c], x="x", g="*", j=c+1, p=" + " if written else ""), end="")
-                written = True
-            else:
-                print(str1.format(a="", x="", g="", j="", p=""), end="")
-        print(str2.format(z=s[r], b=b[r]))
+def print_lp(A, b, C, s, zmienna="π"):
+	max = find_max_long_of_int(A, b, C)
+	xes = len(str(len(A[0])))
+	str1 = "{{p:3}}{{a:>{}}}{{g:1}}{{x:1}}{{j:<{}}}".format(max, xes)			# '{plus:3}{Aij:>[max]}{gwiazdka:1}{x:1}{indeks_x:<[xes]}'
+	str2 = "  {{z:<2}}	{{b:>{}}}".format(max)									# '  {znak:<2}	{bi:>5}'
+	n = len(A[0])
+	for r in range(0, len(A)):
+		row = A[r]
+		written = False
+		for c in range(0, len(row)):
+			if row[c] != 0:
+				print(str1.format(a=row[c], x=zmienna, g="*", j=c+1, p=" + " if written else ""), end="")
+				written = True
+			else:
+				print(str1.format(a="", x="", g="", j="", p=""), end="")
+		print(str2.format(z=s[r], b=b[r]))
+	print("FUNKCJA CELU:")
+	written = False
+	for i in range(0, len(C[:-1])):
+		if i != 0:
+			print(str1.format(a=i, x=zmienna, g="*", j=i+1, p=" + " if written else ""), end="")
+			written = True
+		else:
+			print(str1.format(a="", x="", g="", j="", p=""), end="")
+	print()
+
+def print_Axbc(A, b, C, s, zmienna="π"):
+	max = find_max_long_of_int(A, b, C)
+	str1 = "{{:{}}}{{:2}}".format(max)
+	print("C = {}".format(C))
+	print("s = {}".format(s))
+	print("A || b = ")
+	for r in range(0, len(A)):
+		row = A[r]
+		for c in range(0, len(row)):
+			print(str1.format(row[c], ", " if c < len(row)-1 else ""), end="")
+		print("|| ", end="")
+		print(str1.format(b[r], ""))
+	print("{} = [".format(zmienna), end="")
+	for i in range(0, len(A[0])):
+		print("{}{}{}".format(zmienna, i+1, ", " if i < len(A[0])-1 else ""), end="")
+	print("]")
+
+def primal_to_dual(A, b, C, s):
+	AT = transpose(A)
+	sp = []
+	for i in s:             # po sprowadzeniu do standardowej do poprawki
+		if i == ">":
+			sp.append("<")
+		elif i == "<":
+			sp.append(">")
+		elif i == ">=":
+			sp.append("<=")
+		elif i == "<=":
+			sp.append(">=")
+		else:
+			sp.append("=")
+	return AT, C, b, sp
 
 def find_max_long_of_int(A, b, c):
-    x = [
-        min([y if y < 0 else -y for y in b]),
-        min([y if y < 0 else -y for y in c]),
-        min([y if y < 0 else -y for r in A for y in r])
-    ]
-    return len(str(min(x)))
+	x = [
+		min([y if y < 0 else -y for y in b]),
+		min([y if y < 0 else -y for y in c]),
+		min([y if y < 0 else -y for r in A for y in r])
+	]
+	return len(str(min(x)))
 
 C = []
 A = []
@@ -106,8 +148,13 @@ s = []
 
 C, A, b, s = readFile(sys.argv[1])
 
-print("C",C)
-print("A",A)
-print("b",b)
-print("s",s)
-print_lp(A, b, C, s)
+print("PRYMALNE")
+print_Axbc(A, b, C, s, zmienna="x")
+print("\n\n")
+#print_lp(A, b, C, s, zmienna="x") # ten ok
+AT, bT, CT, sT = primal_to_dual(A, b, C, s)
+print("\n\n")
+print("DUALNE")
+print_Axbc(AT, bT, CT, sT)
+print("\n\n")
+#print_lp(AT, bT, CT, sT) # nie ma jeszcze wszystkich znaków takich samych, więc się sypnie
