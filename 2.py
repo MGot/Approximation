@@ -195,16 +195,54 @@ def find_max_long_of_int(A, b, c):
 	]
 	return len(str(min(max)))
 
+def convert_to_standard_form(A, d, c):
+	As = A
+	Ss = []
+	for i in range(len(As)):
+		if d[i] == "<=":
+			c.append(1)	# Dodawanie s do funkcji celu
+			for k in range (len(As)):
+				#As[k].insert(2*i+1,As[k][i+i])
+				As[k][i] = As[k][i]*(-1)
+
+		
+		# elif d[i] == ">=":
+		# 	for k in range (len(As)):
+		# 		#As[k].insert(2*i+1,As[k][i+i])
+		# 		# DODAĆ S do funkcji celu
+		# 		print()
+	amountOfR = 0
+	for i in range(len(d)):
+		if d[i] == "R":
+			amountOfR += 1
+			pos = amountOfR + i
+			for j in range(len(As)):
+				As[j].insert(pos,As[j][pos-1]*(-1))
+
+	amountOfR = 0
+	for i in range(len(d)): # Pompowanie funkcji celu
+		Ss.append("=")
+		if d[i] == "R":
+			amountOfR += 1
+			pos = amountOfR + i
+			c.insert(pos,-c[pos-1])
+
+					
+
+	print ("\n")
+
+	return As, c, Ss
+
 
 C, A, b, S, d = readFile(sys.argv[1])
 
-print("_____________________________________________________________________________________")
-print("\nPRYMALNE\n")
+# print("_____________________________________________________________________________________")
+# print("\nPRYMALNE\n")
 variables = gen_vars(len(A[0]), var='x')
-print_Axbc(A, b, C, S, variables)
-print("\n\nUkład:\n")
-print_lp(A, b, C, S, variables)
-print("\n\n")
+# print_Axbc(A, b, C, S, variables)
+# print("\n\nUkład:\n")
+# print_lp(A, b, C, S, variables)
+# print("\n\n")
 
 print("_____________________________________________________________________________________")
 print("\nPOSTAĆ STANDARDOWA\n")
@@ -214,18 +252,27 @@ print("\nPOSTAĆ STANDARDOWA\n")
 	As - macierz A po sprowadzeniu do postaci standardowej
 	Cs - funkcja celu po sprowadzeniu do postaci standardowej
 """
-#vars_tmp = replace_free_var(d, variables)
-#Ss, variablesS, s_len = add_s_var(S, vars_tmp)
-#print_Axbc(As, b, Cs, Ss, variablesS)
-#print("\n\nUkład:\n")
-#print_lp(As, b, Cs, Ss, variablesS)
-#print("\n\n")
 
-print("_____________________________________________________________________________________")
-print("\nDUALNE\n")
-""" wymaga postaci standardowej """
-#AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
-#variablesD = gen_vars(len(AD[0]))
-#print_Axbc(AD, bD, CD, SD, variablesD)
-#print("\n\nUkład:\n")
-#print_lp(AD, bD, CD, SD, variablesD)
+print_Axbc(A, b, C, S, variables)
+
+#print (C)
+
+As, Cs, Ss = convert_to_standard_form(A,d,C)
+# print_Axbc(As, b, Cs, S, variables)
+# print ("d = ",d)
+
+vars_tmp = replace_free_var(d, variables)
+Ss, variablesS, s_len = add_s_var(S, vars_tmp)
+print_Axbc(As, b, Cs, Ss, variablesS)
+print("\n\nUkład:\n")
+print_lp(As, b, Cs, Ss, variablesS)
+print("\n\n")
+
+# print("_____________________________________________________________________________________")
+# print("\nDUALNE\n")
+# """ wymaga postaci standardowej """
+# AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
+# variablesD = gen_vars(len(AD[0]))
+# print_Axbc(AD, bD, CD, SD, variablesD)
+# print("\n\nUkład:\n")
+# print_lp(AD, bD, CD, SD, variablesD)
