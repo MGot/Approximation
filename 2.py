@@ -107,10 +107,10 @@ def transpose(A):
 	return [[A[j][i] for j in range(0, len(A))] for i in range(0, len(A[0]))]
 
 def print_lp(A, b, C, s, variables):
-	max = find_max_long_of_int(A, b, C)
+	max = find_max_long_of_int(A, b, C, variables)
 	xes = len(str(len(A[0])))
 	str1 = "{{p:3}}{{a:>{}}}{{g:1}}{{x:2}}".format(max, xes)				# '{plus:3}{Aij:>[max]}{gwiazdka:1}{x:2}'
-	str2 = "  {{z:<2}}	{{b:>{}}}".format(max)						# '  {znak:<2}	{bi:>[max]}'
+	str2 = "  {{z:1}}	{{b:>{}}}".format(max)						# '  {znak:<2}	{bi:>[max]}'
 	n = len(A[0])
 	for r in range(0, len(A)):
 		row = A[r]
@@ -122,7 +122,7 @@ def print_lp(A, b, C, s, variables):
 			else:
 				print(str1.format(a="", x="", g="", p=""), end="")
 		print(str2.format(z=s[r], b=b[r]))
-	print("Funkcja celu:\n")
+	print("Funkcja celu:")
 	written = False
 	for i in range(0, len(variables)):
 		if C[i] != 0:
@@ -132,20 +132,21 @@ def print_lp(A, b, C, s, variables):
 			print(str1.format(a="", x="", g="", p=""), end="")
 	print()
 
-def print_Axbc(A, b, C, s, variables):
-	max = find_max_long_of_int(A, b, C)
+def print_Axbc(A, b, C, s, variables, d):
+	max = find_max_long_of_int(A, b, C, variables)
 	str1 = "{{:>{}}}{{:2}}".format(max)
 	print("C = {}".format(C))
-	print("s = {}".format(s))
-	print("A || b = ")
+	print("|A|*|x|^T (= / ≤ / ≥) |b|")
+	print("[", end="")
+	for i in range(0, len(variables)):
+	    print(str1.format(variables[i] + ("∈R" if d[i] == 'R' else d[i]+"0"), ", " if i < len(A[0])-1 else ""), end="")
+	print("]")
 	for r in range(0, len(A)):
 		row = A[r]
+		print("|", end="")
 		for c in range(0, len(row)):
 			print(str1.format(row[c], ", " if c < len(row)-1 else ""), end="")
-		print("|| " + str1.format(b[r], ""))
-	print("zmienne =")
-	for i in range(0, len(variables)):
-		print(str1.format(variables[i], ", " if i < len(A[0])-1 else ""), end="")
+		print("| {:1} |".format(s[r]) + str1.format(b[r], " |"))
 	print()
 
 def primal_to_dual(A, b, C, s):
@@ -187,13 +188,14 @@ def gen_vars(size, var="π"):
 		X.append(str1.format(i+1))
 	return X
 
-def find_max_long_of_int(A, b, c):
+def find_max_long_of_int(A, b, c, variables):
+	amm = len(str(len(variables))) + 3
 	max = [
 		min([y if y < 0 else -y for y in b]),
 		min([y if y < 0 else -y for y in c]),
 		min([y if y < 0 else -y for r in A for y in r])
 	]
-	return len(str(min(max)))
+	return len(str(min(max))) if len(str(min(max))) > amm else amm
 
 def convert_to_standard_form(A, S, d, c):
 	As = A[:]
@@ -237,21 +239,22 @@ C, A, b, S, d = readFile(sys.argv[1])
 print("_____________________________________________________________________________________")
 print("\nPRYMALNE\n")
 variables = gen_vars(len(A[0]), var='x')
-print_Axbc(A, b, C, S, variables)
+dp = [x if x == 'R' else "≤" if x == '<=' else "≥" for x in d]
+Sp = [x if x == '=' else "≤" if x == '<=' else "≥" for x in S]
+print_Axbc(A, b, C, Sp, variables, dp)
 print("\n\nUkład:\n")
-print_lp(A, b, C, S, variables)
+print_lp(A, b, C, Sp, variables)
 print("\n\n")
 
 
 print("_____________________________________________________________________________________")
 print("\nPOSTAĆ STANDARDOWA\n")
 As, Cs = convert_to_standard_form(A,S,d,C)
-print_Axbc(As, b, Cs, S, variables)
 print ("d = ",d)
-
 vars_tmp = replace_free_var(d, variables)
 Ss, variablesS, s_len = add_s_var(S, vars_tmp)
-print_Axbc(As, b, Cs, Ss, variablesS)
+ds = ["≥" for i in range(len(variablesS))]
+print_Axbc(As, b, Cs, Ss, variablesS, ds)
 print("\n\nUkład:\n")
 print_lp(As, b, Cs, Ss, variablesS)
 print("\n\n")
@@ -261,6 +264,7 @@ print("_________________________________________________________________________
 print("\nDUALNE\n")
 AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
 variablesD = gen_vars(len(AD[0]))
-print_Axbc(AD, bD, CD, SD, variablesD)
+dD = ["≥" for i in range(len(variablesD))]
+print_Axbc(AD, bD, CD, SD, variablesD, dD)
 print("\n\nUkład:\n")
 print_lp(AD, bD, CD, SD, variablesD)
