@@ -195,7 +195,7 @@ def find_max_long_of_int(A, b, c):
 	]
 	return len(str(min(max)))
 
-def convert_to_standard_form(A, d, c):
+def convert_to_standard_form(A, S, d, c):
 	As = A
 	for i in range(len(As)):
 		if d[i] == "<=":
@@ -212,6 +212,22 @@ def convert_to_standard_form(A, d, c):
 			for j in range(len(As)):
 				As[j].insert(pos,As[j][pos-1]*(-1))
 			c.insert(pos,-c[pos-1]) # Pompowanie funkcji celu
+
+	numberOfIneq = 0
+	for i in range(len(S)):
+		if S[i] == "<=":
+			numberOfIneq += 1
+			As[i].append(1)
+			c.append(0)
+		elif S[i] == ">=":
+			numberOfIneq += 1
+			As[i].append(-1)
+			c.append(0)
+
+	if numberOfIneq > 0:
+		for i in range(len(S)):
+			if S[i] == "=":
+				As[i].append(0)
 			
 	return As, c
 
@@ -239,7 +255,7 @@ print_Axbc(A, b, C, S, variables)
 
 #print (C)
 
-As, Cs = convert_to_standard_form(A,d,C)
+As, Cs = convert_to_standard_form(A,S,d,C)
 print_Axbc(As, b, Cs, S, variables)
 print ("d = ",d)
 
