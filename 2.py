@@ -151,7 +151,7 @@ def print_Axbc(A, b, C, s, variables):
 def primal_to_dual(A, b, C, s):
 	AT = transpose(A)
 	sp = []
-	for i in len(A):
+	for i in range(len(A)):
 		sp.append("=")
 	return AT, C, b, sp
 
@@ -213,21 +213,20 @@ def convert_to_standard_form(A, S, d, c):
 				As[j].insert(pos,As[j][pos-1]*(-1))
 			c.insert(pos,-c[pos-1]) # Pompowanie funkcji celu
 
-	numberOfIneq = 0
 	for i in range(len(S)):
 		if S[i] == "<=":
-			numberOfIneq += 1
 			As[i].append(1)
 			c.append(0)
+			for j in range(len(S)):
+				if i != j:
+					As[j].append(0)
+
 		elif S[i] == ">=":
-			numberOfIneq += 1
 			As[i].append(-1)
 			c.append(0)
-
-	if numberOfIneq > 0:
-		for i in range(len(S)):
-			if S[i] == "=":
-				As[i].append(0)
+			for j in range(len(S)):
+				if i != j:
+					As[j].append(0)
 			
 	return As, c
 
