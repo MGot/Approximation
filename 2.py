@@ -34,8 +34,34 @@ def parseLeftSide(cStr, varCount, OptFunc):
 
 	return C
 
+def isInt(value):
+  try:
+    int(value)
+    return True
+  except:
+    return False
+
+def isVariable(v):
+	if v[0] == 'x' and isInt(v[1:]):
+		return True
+	else: 
+		return False	
+
+def isVariableInequality(cStr):
+	signs = [">=","<=", "="]
+	tmpSplits = []
+	for s in  signs:
+		tmpSplits = cStr.split(s)
+		if len(tmpSplits)>=2:
+			break
+
+	if int(tmpSplits[1]) == 0 and isVariable(tmpSplits[0]):
+		return True, s, int(tmpSplits[0][1:])
+	else:
+		return False, None, None
+
 def parseAb(cStr, varCount):
-	signs = [">=","<=", "=", ">", "<"]
+	signs = [">=","<=", "="]
 	tmpSplits = []
 	for s in  signs:
 		tmpSplits = cStr.split(s)
@@ -53,22 +79,28 @@ def readFile(path):
 	A = []
 	b = []
 	s = []
+	d = []
 	try:
 		f = open(path, 'r')
 		for i,l in enumerate(f):
 			if i == 0:
 				varCount = int(l)
+				d = ['R']*varCount
 			elif i == 1:
 				C = parseLeftSide(l, varCount, True)
 			else:
-				Ap, bp, sp =  parseAb(l, varCount)
-				A.append(Ap)
-				b.append(bp)
-				s.append(sp)
+				check, sign, variable = isVariableInequality(l)
+				if check:
+					d[variable] = sign
+				else:	
+					Ap, bp, sp =  parseAb(l, varCount)
+					A.append(Ap)
+					b.append(bp)
+					s.append(sp)
 		f.close()
 	except:
 		print("Blad przy czytaniu pliku")
-	return C, A, b, s
+	return C, A, b, s, d
 
 
 def transpose(A):
@@ -164,7 +196,7 @@ def find_max_long_of_int(A, b, c):
 	return len(str(min(max)))
 
 
-C, A, b, S = readFile(sys.argv[1])
+C, A, b, S, d = readFile(sys.argv[1])
 
 print("_____________________________________________________________________________________")
 print("\nPRYMALNE\n")
