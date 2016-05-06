@@ -35,11 +35,11 @@ def parseLeftSide(cStr, varCount, OptFunc):
 	return C
 
 def isInt(value):
-  try:
-    int(value)
-    return True
-  except:
-    return False
+	try:
+		int(value)
+		return True
+	except:
+		return False
 
 def isVariable(v):
 	if v[0] == 'x' and isInt(v[1:]):
@@ -125,8 +125,8 @@ def print_lp(A, b, C, s, variables):
 	print("Funkcja celu:\n")
 	written = False
 	for i in range(0, len(variables)):
-		if i != 0:
-			print(str1.format(a=i, x=variables[i], g="*", p=" + " if written else ""), end="")
+		if C[i] != 0:
+			print(str1.format(a=C[i], x=variables[i], g="*", p=" + " if written else ""), end="")
 			written = True
 		else:
 			print(str1.format(a="", x="", g="", p=""), end="")
@@ -151,7 +151,7 @@ def print_Axbc(A, b, C, s, variables):
 def primal_to_dual(A, b, C, s):
 	AT = transpose(A)
 	sp = []
-	for i in range(len(A)):
+	for i in range(len(AT)):
 		sp.append("=")
 	return AT, C, b, sp
 
@@ -196,7 +196,7 @@ def find_max_long_of_int(A, b, c):
 	return len(str(min(max)))
 
 def convert_to_standard_form(A, S, d, c):
-	As = A
+	As = A[:]
 	for i in range(len(As)):
 		if d[i] == "<=":
 			c[i] = c[i]*(-1)
@@ -227,49 +227,40 @@ def convert_to_standard_form(A, S, d, c):
 			for j in range(len(S)):
 				if i != j:
 					As[j].append(0)
-			
+
 	return As, c
 
 
 C, A, b, S, d = readFile(sys.argv[1])
 
-# print("_____________________________________________________________________________________")
-# print("\nPRYMALNE\n")
+
+print("_____________________________________________________________________________________")
+print("\nPRYMALNE\n")
 variables = gen_vars(len(A[0]), var='x')
-# print_Axbc(A, b, C, S, variables)
-# print("\n\nUkład:\n")
-# print_lp(A, b, C, S, variables)
-# print("\n\n")
+print_Axbc(A, b, C, S, variables)
+print("\n\nUkład:\n")
+print_lp(A, b, C, S, variables)
+print("\n\n")
+
 
 print("_____________________________________________________________________________________")
 print("\nPOSTAĆ STANDARDOWA\n")
-"""
-	zakłada istnienie wektora d zawierającego 'R', '<=', lub '=>'
-	Ss - znaki dla postaci standardowej
-	As - macierz A po sprowadzeniu do postaci standardowej
-	Cs - funkcja celu po sprowadzeniu do postaci standardowej
-"""
-
-print_Axbc(A, b, C, S, variables)
-
-#print (C)
-
 As, Cs = convert_to_standard_form(A,S,d,C)
 print_Axbc(As, b, Cs, S, variables)
 print ("d = ",d)
 
-# vars_tmp = replace_free_var(d, variables)
-# Ss, variablesS, s_len = add_s_var(S, vars_tmp)
-# print_Axbc(As, b, Cs, Ss, variablesS)
-# print("\n\nUkład:\n")
-# print_lp(As, b, Cs, Ss, variablesS)
-# print("\n\n")
+vars_tmp = replace_free_var(d, variables)
+Ss, variablesS, s_len = add_s_var(S, vars_tmp)
+print_Axbc(As, b, Cs, Ss, variablesS)
+print("\n\nUkład:\n")
+print_lp(As, b, Cs, Ss, variablesS)
+print("\n\n")
 
-# print("_____________________________________________________________________________________")
-# print("\nDUALNE\n")
-# """ wymaga postaci standardowej """
-# AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
-# variablesD = gen_vars(len(AD[0]))
-# print_Axbc(AD, bD, CD, SD, variablesD)
-# print("\n\nUkład:\n")
-# print_lp(AD, bD, CD, SD, variablesD)
+
+print("_____________________________________________________________________________________")
+print("\nDUALNE\n")
+AD, bD, CD, SD = primal_to_dual(As, b, Cs, Ss)
+variablesD = gen_vars(len(AD[0]))
+print_Axbc(AD, bD, CD, SD, variablesD)
+print("\n\nUkład:\n")
+print_lp(AD, bD, CD, SD, variablesD)
