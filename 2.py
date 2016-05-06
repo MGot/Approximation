@@ -197,20 +197,13 @@ def find_max_long_of_int(A, b, c):
 
 def convert_to_standard_form(A, d, c):
 	As = A
-	Ss = []
 	for i in range(len(As)):
 		if d[i] == "<=":
-			c.append(1)	# Dodawanie s do funkcji celu
+			c[i] = c[i]*(-1)
 			for k in range (len(As)):
 				#As[k].insert(2*i+1,As[k][i+i])
 				As[k][i] = As[k][i]*(-1)
 
-		
-		# elif d[i] == ">=":
-		# 	for k in range (len(As)):
-		# 		#As[k].insert(2*i+1,As[k][i+i])
-		# 		# DODAĆ S do funkcji celu
-		# 		print()
 	amountOfR = 0
 	for i in range(len(d)):
 		if d[i] == "R":
@@ -218,20 +211,9 @@ def convert_to_standard_form(A, d, c):
 			pos = amountOfR + i
 			for j in range(len(As)):
 				As[j].insert(pos,As[j][pos-1]*(-1))
-
-	amountOfR = 0
-	for i in range(len(d)): # Pompowanie funkcji celu
-		Ss.append("=")
-		if d[i] == "R":
-			amountOfR += 1
-			pos = amountOfR + i
-			c.insert(pos,-c[pos-1])
-
-					
-
-	print ("\n")
-
-	return As, c, Ss
+			c.insert(pos,-c[pos-1]) # Pompowanie funkcji celu
+			
+	return As, c
 
 
 C, A, b, S, d = readFile(sys.argv[1])
@@ -257,16 +239,16 @@ print_Axbc(A, b, C, S, variables)
 
 #print (C)
 
-As, Cs, Ss = convert_to_standard_form(A,d,C)
-# print_Axbc(As, b, Cs, S, variables)
-# print ("d = ",d)
+As, Cs = convert_to_standard_form(A,d,C)
+print_Axbc(As, b, Cs, S, variables)
+print ("d = ",d)
 
-vars_tmp = replace_free_var(d, variables)
-Ss, variablesS, s_len = add_s_var(S, vars_tmp)
-print_Axbc(As, b, Cs, Ss, variablesS)
-print("\n\nUkład:\n")
-print_lp(As, b, Cs, Ss, variablesS)
-print("\n\n")
+# vars_tmp = replace_free_var(d, variables)
+# Ss, variablesS, s_len = add_s_var(S, vars_tmp)
+# print_Axbc(As, b, Cs, Ss, variablesS)
+# print("\n\nUkład:\n")
+# print_lp(As, b, Cs, Ss, variablesS)
+# print("\n\n")
 
 # print("_____________________________________________________________________________________")
 # print("\nDUALNE\n")
