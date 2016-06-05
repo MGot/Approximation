@@ -1,0 +1,7 @@
+{
+	"numberOfVariables": "3",
+	"clauses": [
+		[1,2],
+		[2,3]
+	]	
+}
