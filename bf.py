@@ -57,18 +57,31 @@ def genCases(n):
         cases[i].insert(0,'_')
     return cases
 
-clauses, numOfVar, valueOfClauses = getClauses(sys.argv[1])
-
-#print (numOfVar)
-#print (clauses)
-
-#print(fval(clauses,[0, 0, 0, '?'])) 
-
-cases = genCases(numOfVar)
-result = []
-print(cases)
-for i in cases:
+def getWeights(clauses,cases,valueOfClauses):
+    counter = 0
+    weights = []
+    for i in cases:
+        weights.append(0)
         i = ["_"]+[int(j) for j in i[1:]]
         sum1, l = fval_v2(clauses,i)
-        print(i[1:])
-        print(l)
+        for j in range(len(valueOfClauses)):
+            if l[j] == 1:
+                weights[counter] += valueOfClauses[j]
+        #print("Case:     ",i[1:])
+        #print("Klauzule: ",l)
+        #print("Waga:     ",weights[counter])
+        counter += 1
+    return max(weights), [i for i, j in enumerate(weights) if j == max(weights)]#weights.index(max(weights))
+
+
+clauses, numOfVar, valueOfClauses = getClauses(sys.argv[1])
+
+cases = genCases(numOfVar)
+
+maxW, indexes = getWeights(clauses,cases,valueOfClauses)
+
+for i in indexes:
+    print(cases[i][1:])
+
+print(maxW)
+print(indexes)
