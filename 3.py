@@ -7,7 +7,7 @@ def getClauses(f):
 	
 	with open(f) as data_file:
 		data = json.load(data_file)
-	
+	print(data)
 	numOfVar = data["numberOfVariables"]
 	clauses = data["clauses"]
 	valueOfClauses = data["valueOfClauses"]
@@ -78,15 +78,32 @@ def expected_W(clauses, values, valueOfClauses):
 		expected = expected + expected_Wc(clauses[i], values, valueOfClauses[i])
 	return expected
 
+def derandom(clauses, values, valueOfClauses):
+
+	expe = expected_W(clauses, values, valueOfClauses)
+	print(expe)
+	for i in range(1, len(values)):
+		values[i] = 1
+		expe_one = expected_W(clauses, values, valueOfClauses)
+		values[i] = 0
+		expe_zero = expected_W(clauses, values, valueOfClauses)
+		if expe_one >= expe_zero:
+			values[i] = 1
+			expe = expe_one
+		else:
+			values[i] = 0
+			expe = expe_zero
+	print(values[1:])
+	print(expe_zero)
+
+def prep_values(numOfVar):
+	return ['_']+['?' for i in range(numOfVar)]
 
 clauses, numOfVar, valueOfClauses = getClauses(sys.argv[1])
 
 print (numOfVar)
 print (clauses)
 
-print(fval_v2(clauses,['_', '?', '?', '?']))
-print(expected_W(clauses,['_', '?', '?', '?'],valueOfClauses))
-print(fval_v2(clauses,['_', 1, '?', '?'])) 
-print(expected_W(clauses,['_', 1, '?', '?'],valueOfClauses))
-print(fval_v2(clauses,['_', 0, 1, '?']))  
-print(expected_W(clauses,['_', 1, 1, '?'],valueOfClauses))
+values = prep_values(numOfVar)
+print(values)
+derandom(clauses, values, valueOfClauses)
