@@ -45,6 +45,7 @@ def cval_v2(clause, values):
     return value, unknown_count
 
 def genCases(n):
+    n = n + 1
     cases = []
     for i in range(pow(2,(n-1))):
         cases.append(list('{0:0b}'.format(i)))
@@ -53,7 +54,7 @@ def genCases(n):
                 cases[i].insert(0,'0')
 
     for i in range(pow(2,(n-1))):
-        cases[i].insert(0,'jakies bzdury')
+        cases[i].insert(0,'_')
     return cases
 
 clauses, numOfVar, valueOfClauses = getClauses(sys.argv[1])
@@ -65,10 +66,9 @@ clauses, numOfVar, valueOfClauses = getClauses(sys.argv[1])
 
 cases = genCases(numOfVar)
 result = []
+print(cases)
 for i in cases:
-    for j in clauses:
-        sum1, l = fval_v2(j,list(i))
-        
-print(cases[0])
-print(sum1)
-print(l)
+        i = ["_"]+[int(j) for j in i[1:]]
+        sum1, l = fval_v2(clauses,i)
+        print(i[1:])
+        print(l)
