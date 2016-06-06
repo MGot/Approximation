@@ -1,7 +1,8 @@
 {
 	"numberOfVariables": 3,
 	"clauses": [
-		[1,2],
+		[1,-2],
 		[2,3]
-	]	
+	],
+	"valueOfClauses": [10, 20]
 }
