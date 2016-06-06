@@ -1,3 +1,8 @@
+# autorzy:
+# Marcin Plata
+# Marcin Gotszling
+# Błażej Możanowicz
+
 import sys
 import math
 import string
